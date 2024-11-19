@@ -143,34 +143,105 @@ public class DataBaseTest extends DataBaseHelper {
 
     @Test
 
+    //9.Calculate the average salary for each department, including department names
+    //- Departman adlarını da içeren her departmanın ortalama maaşını hesapla.
+
+
+    public void query09() throws SQLException {
+        DBConnectionOpen();
+        ResultSet rs = statement.executeQuery("SELECT d.dept_no, d.dept_name, AVG(s.salary) AS average_salary " +
+                "FROM employees e " +
+                "JOIN dept_emp de ON e.emp_no = de.emp_no " +
+                "join salaries s ON e.emp_no = s.emp_no " +
+                "join departments d ON de.dept_no = d.dept_no " +
+                "GROUP BY d.dept_no, d.dept_name");
+
+        while (rs.next()) {
+            String deptNo = rs.getString("dept_no");
+            String deptName = rs.getString("dept_name");
+            double averageSalary = rs.getDouble("average_salary");
+            System.out.println("Department Details - Dept No: " + deptNo + ", Dept Name: "
+                    + deptName + ", Average Salary: " + Math.round(averageSalary * 100.0) / 100.0);
+        }
+        DBConnectionClose();
+    }
+    @Test
+
+    //10. Find all salary changes for employee with emp. no '10102'
+        //- '10102' iş numarasına sahip çalışanın tüm maaş değişikliklerini bul.
+
+       public void query10() throws SQLException{
+                DBConnectionOpen();
+            ResultSet rs = statement.executeQuery("SELECT emp_no, salary, from_date, to_date " +
+                    "FROM salaries " +
+                    "WHERE emp_no = '10102' " +
+                    "ORDER BY from_date");
+
+            while (rs.next()) {
+                int empNo = rs.getInt("emp_no");
+                double salary = rs.getDouble("salary");
+                String fromDate = rs.getString("from_date");
+                String toDate = rs.getString("to_date");
+                System.out.println("Salary Details - Emp No: " + empNo + ", Salary: "
+                        + Math.round(salary * 100.0) / 100.0 + ", From Date: " + fromDate + ", To Date: " + toDate);
+            }
+        DBConnectionClose();
+        }
+
+
+        @Test
+
     //
     //
 
-    public void query09() {
+    public void query11() throws SQLException {
+              {
+                DBConnectionOpen();
+                ResultSet rs = statement.executeQuery("SELECT emp_no, salary, to_date " +
+                        "FROM salaries " +
+                        "WHERE emp_no = '10102' " +
+                        "ORDER BY to_date");
+
+                while (rs.next()) {
+                    int empNo = rs.getInt("emp_no");
+                    double salary = rs.getDouble("salary");
+                    String toDate = rs.getString("to_date");
+                    System.out.println("Salary Details - Emp No: " + empNo + ", Salary: "
+                            + String.format("%.2f", salary) + ", To Date: " + toDate);
+                }
+                DBConnectionClose();
+
+            }
     }
 
     @Test
 
-    //
-    //
+    //12. Find the employee with the highest salary
+    //- En yüksek maaşa sahip çalışanı bul.
 
-    public void query10() {
-    }
+    public void query12() throws SQLException {
+        DBConnectionOpen();
+        {
+            ResultSet rs = statement.executeQuery("SELECT * FROM employees " +
+                    "JOIN salaries ON employees.emp_no = salaries.emp_no " +
+                    "ORDER BY salary DESC " +
+                    "LIMIT 1");
 
-    @Test
+            if (rs.next()) {
+                int empNo = rs.getInt("emp_no");
+                String firstName = rs.getString("first_name");
+                String lastName = rs.getString("last_name");
+                double salary = rs.getDouble("salary");
+                System.out.println("Employee Details - Emp No: " + empNo + ", First Name: " + firstName + ", Last Name: " + lastName + ", Salary: " + Math.round(salary * 100.0) / 100.0);
+            }
+            DBConnectionClose();
+        }
 
-    //
-    //
 
-    public void query11() {
-    }
 
-    @Test
 
-    //
-    //
 
-    public void query12() {
+
     }
 
     @Test
@@ -590,34 +661,99 @@ public class DataBaseTest extends DataBaseHelper {
 
     @Test
 
-    //
-    //
+// 33. Finding the average "employee age"
+// Ortalama "çalışan yaşını" bulma
 
-    public void query33() {
+    public void query33() throws SQLException {
+        DBConnectionOpen();
+
+        ResultSet rs = statement.executeQuery("SELECT AVG(TIMESTAMPDIFF(YEAR, birth_date, CURDATE())) AS average_age FROM employees");
+
+        if (rs.next()) {
+            double avgAge = rs.getDouble("average_age");
+            System.out.println("Average Employee Age: " + avgAge + " years");
+        }
+
+        DBConnectionClose();
     }
+
 
     @Test
 
-    //
-    //
+    //Finding the number of employees per department
+    //-- Bölüm başına çalışan sayısını bulma
 
-    public void query34() {
+    public void query34() throws SQLException {
+        {
+        DBConnectionOpen();
+
+        ResultSet rs = statement.executeQuery(
+                "SELECT d.dept_name, COUNT(de.emp_no) AS num_employees " +
+                        "FROM employees.dept_emp de " +
+                        "JOIN employees.departments d ON de.dept_no = d.dept_no " +
+                        "GROUP BY d.dept_name"
+        );
+
+        while (rs.next()) {
+            String deptName = rs.getString("dept_name");
+            int numEmployees = rs.getInt("num_employees");
+            System.out.println("Department: " + deptName + ", Number of Employees: " + numEmployees);
+        }
+        DBConnectionClose();
     }
+
+}
 
     @Test
 
-    //
-    //
+    //Finding the managerial history of employee with ID (emp. no) 110022
+    //-- 110022 numaralı çalışanın yönetim geçmişini bulma
 
-    public void query35() {
+
+    public void query35() throws SQLException {
+        DBConnectionOpen();
+
+        ResultSet rs = statement.executeQuery(
+                "SELECT dept_no, from_date, to_date " +
+                "FROM employees.dept_manager " +
+                "WHERE emp_no = '110022' " +
+                "ORDER BY from_date ASC"
+        );
+
+        while (rs.next()) {
+            String deptNo = rs.getString("dept_no");
+            String fromDate = rs.getString("from_date");
+            String toDate = rs.getString("to_date");
+            System.out.println("Managerial History - Dept No: " + deptNo + ", From Date: " + fromDate + ", To Date: " + toDate);
+        }
+        DBConnectionClose();
     }
+
 
     @Test
 
-    //
-    //
+    //Find the duration of employment for each employee
+    //-- Her çalışanın istihdam süresini bulma
 
-    public void query36() {
+
+    public void query36() throws SQLException{
+        DBConnectionOpen();
+        ResultSet rs = statement.executeQuery(
+                "SELECT emp_no, first_name, last_name, DATEDIFF(CURDATE(), hire_date) AS employment_duration " +
+                        "FROM employees.employees " +
+                        "ORDER BY employment_duration DESC");
+
+
+            while (rs.next()) {
+                int empNo = rs.getInt("emp_no");
+                String firstName = rs.getString("first_name");
+                String lastName = rs.getString("last_name");
+                int duration = rs.getInt("employment_duration");
+
+                System.out.println("Employee - Emp No: " + empNo + ", Name: " + firstName + " " + lastName + ", Duration: " + duration + " days");
+            }
+
+        DBConnectionClose();
     }
 
     @Test
