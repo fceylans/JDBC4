@@ -9,35 +9,61 @@ public class DataBaseTest extends DataBaseHelper {
 
     @Test
 
-    //
-    //
+    // 1. List all employees in department D001.
+    // - D001 departmanındaki tüm çalışanları listele.
 
-    public void query01() {
+    public void query01() throws SQLException {
+
+        DBConnectionOpen();
+        ResultSet rs = statement.executeQuery("select * from dept_emp\n" +
+                "where dept_no='d001' \n" +
+                "order by emp_no;\n");
+
+        DBConnectionClose();
+
     }
 
     @Test
 
+    // 2. List all employees in 'Human Resources' department.
+    //   'İnsan Kaynakları' departmanındaki tüm çalışanları listele.
 
-    //
-    //
+    public void query02() throws SQLException {
+        DBConnectionOpen();
+        ResultSet rs = statement.executeQuery("select * from dept_emp\n" +
+                "where dept_no='d003' \n" +
+                "order by emp_no;");
 
-    public void query02() {
+        DBConnectionClose();
     }
 
     @Test
 
-    //
-    //
+    // 3. Calculate the average salary of all employees
+    // Tüm çalışanların ortalama maaşını hesapla.
 
-    public void query03() {
+    public void query03() throws SQLException {
+
+        DBConnectionOpen();
+        ResultSet rs = statement.executeQuery("select avg(salary) as ortalamaMaas from salaries;");
+
+        DBConnectionClose();
     }
 
     @Test
 
-    //
-    //
+    //  4. Calculate the average salary of all employees with gender "M"
+    //  "Erkek" cinsiyetindeki tüm çalışanların ortalama maaşını hesapla.
 
-    public void query04() {
+    public void query04() throws SQLException {
+
+        DBConnectionOpen();
+        ResultSet rs = statement.executeQuery("select employees.employees.gender, avg(salaries.salary) as ortalamaMaas\n" +
+                "from salaries\n" +
+                "join employees.employees ON salaries.emp_no = employees.employees.emp_no\n" +
+                "where employees.employees.gender = 'M' ;");
+
+        DBConnectionClose();
     }
 
     @Test
@@ -422,34 +448,68 @@ public class DataBaseTest extends DataBaseHelper {
 
     @Test
 
-    //
-    //
+    // 25 - Annemarie Redmiles" adlı çalışanın bilgilerini (çalışan numarası, doğum tarihi, ilk adı, soyadı,
+    // cinsiyet, işe alınma tarihi listele.
 
-    public void query25() {
+    public void query25() throws SQLException {
+
+        DBConnectionOpen();
+        ResultSet rs = statement.executeQuery("select emp_no,birth_date,first_name,last_name,gender,hire_date\n" +
+                "from employees\n" +
+                "where first_name='Annemarie' and last_name='Redmiles';");
+
+        DBConnectionClose();
     }
 
     @Test
 
-    //
-    //
+    // 26 - "Annemarie Redmiles" adlı çalışanın tüm bilgilerini (çalışan numarası, doğum tarihi, ilk adı,
+    //     soyadı, cinsiyet, işe alınma tarihi, maaş, departman ve unvan) listele.
 
-    public void query26() {
+    public void query26() throws SQLException {
+
+        DBConnectionOpen();
+        ResultSet rs = statement.executeQuery("select employees.emp_no, birth_date, first_name, last_name, gender, hire_date, salaries.salary, departments.dept_name, titles.title\n" +
+                "from dept_emp\n" +
+                "left join employees on employees.emp_no= dept_emp.emp_no\n" +
+                "left join departments on departments.dept_no= dept_emp.dept_no\n" +
+                "left join titles on titles.emp_no= dept_emp.emp_no\n" +
+                "left join salaries on salaries.emp_no= dept_emp.emp_no\n" +
+                "where first_name='Annemarie' and last_name='Redmiles';");
+
+        DBConnectionClose();
     }
 
     @Test
 
-    //
-    //
+    // 27 - D005 bölümündeki tüm çalışanları ve yöneticileri listele
 
-    public void query27() {
+    public void query27() throws SQLException {
+
+        DBConnectionOpen();
+        ResultSet rs = statement.executeQuery("select* \n" +
+                "from dept_emp\n" +
+                "left join dept_manager ON dept_emp.dept_no=dept_manager.dept_no\n" +
+                "where dept_emp.dept_no='d005' and dept_manager.dept_no='d005';");
+
+        DBConnectionClose();
     }
 
     @Test
 
-    //
-    //
+    // 28 - '1994-02-24' tarihinden sonra işe alınan ve 50.000'den fazla kazanan tüm çalışanları listele
 
-    public void query28() {
+    public void query28() throws SQLException {
+
+        DBConnectionOpen();
+        ResultSet rs = statement.executeQuery("select* \n" +
+                "from employees\n" +
+                "left join salaries on employees.emp_no=salaries.emp_no\n" +
+                "where employees.hire_date >'1994-02-24'\n" +
+                "and salaries.salary >'50000';");
+
+
+        DBConnectionClose();
     }
 
     @Test
