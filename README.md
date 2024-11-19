@@ -458,8 +458,8 @@ SQLProject
 
 | Role            | Name               |
 |-----------------|--------------------|
-| Project Lead    | [Project Lead's Name]  |
-| Tester          | [Tester 1 Name]     |
-| Tester          | [Tester 2 Name]     |
-| Tester          | [Tester 3 Name]     |
-| Tester          | [Tester 4 Name]     |
+|QA Automation Engineer & Project Lead  | [Fatmanur CEYLAN](https://github.com/fceylans)  |
+| QA Automation Engineer          | [Buse OZER](https://github.com/acklnbuse)       |
+| QA Automation Engineer          | [Mazlum OZDEMIR](https://github.com/mazlumoz)   |
+| QA Automation Engineer          | [Mehmet Emin VAHAP](https://github.com/mmevaa)  |
+| QA Automation Engineer          | [Omer Faruk OZ](https://github.com/omerfoz)     |
