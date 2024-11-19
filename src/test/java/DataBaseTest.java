@@ -200,20 +200,20 @@ public class DataBaseTest extends DataBaseHelper {
     public void query12() throws SQLException {
 
         DBConnectionOpen();
-            ResultSet rs = statement.executeQuery("SELECT * FROM employees " +
-                    "JOIN salaries ON employees.emp_no = salaries.emp_no " +
-                    "ORDER BY salary DESC " +
-                    "LIMIT 1");
+        ResultSet rs = statement.executeQuery("SELECT * FROM employees " +
+                "JOIN salaries ON employees.emp_no = salaries.emp_no " +
+                "ORDER BY salary DESC " +
+                "LIMIT 1");
 
-            if (rs.next()) {
-                int empNo = rs.getInt("emp_no");
-                String firstName = rs.getString("first_name");
-                String lastName = rs.getString("last_name");
-                double salary = rs.getDouble("salary");
-                System.out.println("Employee Details - Emp No: " + empNo + ", First Name: " + firstName + ", Last Name: " + lastName + ", Salary: " + Math.round(salary * 100.0) / 100.0);
-            }
+        if (rs.next()) {
+            int empNo = rs.getInt("emp_no");
+            String firstName = rs.getString("first_name");
+            String lastName = rs.getString("last_name");
+            double salary = rs.getDouble("salary");
+            System.out.println("Employee Details - Emp No: " + empNo + ", First Name: " + firstName + ", Last Name: " + lastName + ", Salary: " + Math.round(salary * 100.0) / 100.0);
+        }
 
-            DBConnectionClose();
+        DBConnectionClose();
     }
 
 
@@ -665,21 +665,21 @@ public class DataBaseTest extends DataBaseHelper {
     //Finding the number of employees per department
     public void query34() throws SQLException {
 
-            DBConnectionOpen();
-            ResultSet rs = statement.executeQuery(
-                    "SELECT d.dept_name, COUNT(de.emp_no) AS num_employees " +
-                            "FROM employees.dept_emp de " +
-                            "JOIN employees.departments d ON de.dept_no = d.dept_no " +
-                            "GROUP BY d.dept_name"
-            );
+        DBConnectionOpen();
+        ResultSet rs = statement.executeQuery(
+                "SELECT d.dept_name, COUNT(de.emp_no) AS num_employees " +
+                        "FROM employees.dept_emp de " +
+                        "JOIN employees.departments d ON de.dept_no = d.dept_no " +
+                        "GROUP BY d.dept_name"
+        );
 
-            while (rs.next()) {
-                String deptName = rs.getString("dept_name");
-                int numEmployees = rs.getInt("num_employees");
-                System.out.println("Department: " + deptName + ", Number of Employees: " + numEmployees);
-            }
+        while (rs.next()) {
+            String deptName = rs.getString("dept_name");
+            int numEmployees = rs.getInt("num_employees");
+            System.out.println("Department: " + deptName + ", Number of Employees: " + numEmployees);
+        }
 
-            DBConnectionClose();
+        DBConnectionClose();
     }
 
 
