@@ -2,16 +2,12 @@ import org.testng.annotations.Test;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.sql.Statement;
-import java.util.List;
 
 public class DataBaseTest extends DataBaseHelper {
 
+
     @Test
-
     // 1. List all employees in department D001.
-    // - D001 departmanındaki tüm çalışanları listele.
-
     public void query01() throws SQLException {
 
         DBConnectionOpen();
@@ -23,12 +19,11 @@ public class DataBaseTest extends DataBaseHelper {
 
     }
 
+
     @Test
-
     // 2. List all employees in 'Human Resources' department.
-    //   'İnsan Kaynakları' departmanındaki tüm çalışanları listele.
-
     public void query02() throws SQLException {
+
         DBConnectionOpen();
         ResultSet rs = statement.executeQuery("select * from dept_emp\n" +
                 "where dept_no='d003' \n" +
@@ -37,11 +32,9 @@ public class DataBaseTest extends DataBaseHelper {
         DBConnectionClose();
     }
 
+
     @Test
-
     // 3. Calculate the average salary of all employees
-    // Tüm çalışanların ortalama maaşını hesapla.
-
     public void query03() throws SQLException {
 
         DBConnectionOpen();
@@ -50,11 +43,9 @@ public class DataBaseTest extends DataBaseHelper {
         DBConnectionClose();
     }
 
+
     @Test
-
     //  4. Calculate the average salary of all employees with gender "M"
-    //  "Erkek" cinsiyetindeki tüm çalışanların ortalama maaşını hesapla.
-
     public void query04() throws SQLException {
 
         DBConnectionOpen();
@@ -66,29 +57,26 @@ public class DataBaseTest extends DataBaseHelper {
         DBConnectionClose();
     }
 
+
     @Test
-
     //5. Calculate the average salary of all employees with gender "F"
-    //-- "Kadın" cinsiyetindeki tüm çalışanların ortalama maaşını hesapla.
-
     public void query05() throws SQLException {
 
         DBConnectionOpen();
+
         ResultSet rs = statement.executeQuery("select avg(salary) as kadınCalsOrtMas\n" +
                 "from employees\n" +
                 "left join salaries ON employees.emp_no = salaries.emp_no\n" +
                 "where gender='F';");
-        QueryResults(rs);
 
+        QueryResults(rs);
         DBConnectionClose();
 
     }
 
+
     @Test
-
     //6. List all employees in the "Sales" department with a salary greater than 70,000.
-    //-- Maaşı 70.000'den yüksek olan "Satış" departmanındaki tüm çalışanları listele.
-
     public void query06() throws SQLException {
 
         DBConnectionOpen();
@@ -103,11 +91,9 @@ public class DataBaseTest extends DataBaseHelper {
 
     }
 
+
     @Test
-
     //7. This query retrieves employees who have salaries between 50000 and 100000.
-    // -- Bu sorgu, maaşı 50.000 ile 100.000 arasında olan çalışanları getirir.
-
     public void query07() throws SQLException {
 
         DBConnectionOpen();
@@ -122,10 +108,7 @@ public class DataBaseTest extends DataBaseHelper {
 
 
     @Test
-
     //8. Calculate the average salary for each department (by department number or department name)
-    // -- Her departmanın ortalama maaşını hesapla (departman numarasına veya departman adına göre)
-
     public void query08() throws SQLException {
 
         DBConnectionOpen();
@@ -136,18 +119,15 @@ public class DataBaseTest extends DataBaseHelper {
                 "group by dept_name");
 
         QueryResults(rs);
-
         DBConnectionClose();
 
     }
 
+
     @Test
-
     //9.Calculate the average salary for each department, including department names
-    //- Departman adlarını da içeren her departmanın ortalama maaşını hesapla.
-
-
     public void query09() throws SQLException {
+
         DBConnectionOpen();
         ResultSet rs = statement.executeQuery("SELECT d.dept_no, d.dept_name, AVG(s.salary) AS average_salary " +
                 "FROM employees e " +
@@ -165,63 +145,61 @@ public class DataBaseTest extends DataBaseHelper {
         }
         DBConnectionClose();
     }
+
+
     @Test
-
     //10. Find all salary changes for employee with emp. no '10102'
-        //- '10102' iş numarasına sahip çalışanın tüm maaş değişikliklerini bul.
+    public void query10() throws SQLException {
 
-       public void query10() throws SQLException{
-                DBConnectionOpen();
-            ResultSet rs = statement.executeQuery("SELECT emp_no, salary, from_date, to_date " +
+        DBConnectionOpen();
+        ResultSet rs = statement.executeQuery("SELECT emp_no, salary, from_date, to_date " +
+                "FROM salaries " +
+                "WHERE emp_no = '10102' " +
+                "ORDER BY from_date");
+
+        while (rs.next()) {
+            int empNo = rs.getInt("emp_no");
+            double salary = rs.getDouble("salary");
+            String fromDate = rs.getString("from_date");
+            String toDate = rs.getString("to_date");
+            System.out.println("Salary Details - Emp No: " + empNo + ", Salary: "
+                    + Math.round(salary * 100.0) / 100.0 + ", From Date: " + fromDate + ", To Date: " + toDate);
+        }
+        DBConnectionClose();
+    }
+
+
+    @Test
+    //Find the salary increases for employee with employee number '10102' (using the to_date colum
+    // in salaries)
+
+    public void query11() throws SQLException {
+
+        {
+            DBConnectionOpen();
+            ResultSet rs = statement.executeQuery("SELECT emp_no, salary, to_date " +
                     "FROM salaries " +
                     "WHERE emp_no = '10102' " +
-                    "ORDER BY from_date");
+                    "ORDER BY to_date");
 
             while (rs.next()) {
                 int empNo = rs.getInt("emp_no");
                 double salary = rs.getDouble("salary");
-                String fromDate = rs.getString("from_date");
                 String toDate = rs.getString("to_date");
                 System.out.println("Salary Details - Emp No: " + empNo + ", Salary: "
-                        + Math.round(salary * 100.0) / 100.0 + ", From Date: " + fromDate + ", To Date: " + toDate);
+                        + String.format("%.2f", salary) + ", To Date: " + toDate);
             }
-        DBConnectionClose();
+            DBConnectionClose();
+
         }
-
-
-        @Test
-
-    //
-    //
-
-    public void query11() throws SQLException {
-              {
-                DBConnectionOpen();
-                ResultSet rs = statement.executeQuery("SELECT emp_no, salary, to_date " +
-                        "FROM salaries " +
-                        "WHERE emp_no = '10102' " +
-                        "ORDER BY to_date");
-
-                while (rs.next()) {
-                    int empNo = rs.getInt("emp_no");
-                    double salary = rs.getDouble("salary");
-                    String toDate = rs.getString("to_date");
-                    System.out.println("Salary Details - Emp No: " + empNo + ", Salary: "
-                            + String.format("%.2f", salary) + ", To Date: " + toDate);
-                }
-                DBConnectionClose();
-
-            }
     }
 
+
     @Test
-
     //12. Find the employee with the highest salary
-    //- En yüksek maaşa sahip çalışanı bul.
-
     public void query12() throws SQLException {
+
         DBConnectionOpen();
-        {
             ResultSet rs = statement.executeQuery("SELECT * FROM employees " +
                     "JOIN salaries ON employees.emp_no = salaries.emp_no " +
                     "ORDER BY salary DESC " +
@@ -234,20 +212,16 @@ public class DataBaseTest extends DataBaseHelper {
                 double salary = rs.getDouble("salary");
                 System.out.println("Employee Details - Emp No: " + empNo + ", First Name: " + firstName + ", Last Name: " + lastName + ", Salary: " + Math.round(salary * 100.0) / 100.0);
             }
+
             DBConnectionClose();
-        }
-
-
-
-
-
-
     }
 
-    @Test
 
+    @Test
     //Find the latest salaries for each employee
     public void query13() throws SQLException {
+
+        DBConnectionOpen();
 
         System.out.println("Executing Task 13: Find the latest salaries for each employee.");
         ResultSet result = statement.executeQuery("SELECT emp_no, salary, to_date " +
@@ -265,14 +239,17 @@ public class DataBaseTest extends DataBaseHelper {
                     ", To Date: " + toDate);
         }
 
+        DBConnectionClose();
     }
 
-    @Test
 
+    @Test
     // List the first name, last name, and highest salary of employees in the "Sales" department.
     //Order the list by highest salary descending and only show the employee with the highest salary.
 
     public void query14() throws SQLException {
+
+        DBConnectionOpen();
 
         System.out.println("Executing Task 14: List the first name, last name, and highest salary of employees in the 'Sales' department.");
         ResultSet result = statement.executeQuery("SELECT e.first_name, e.last_name, MAX(s.salary) AS highest_salary " +
@@ -293,12 +270,15 @@ public class DataBaseTest extends DataBaseHelper {
                     + ", Last Name: " + lastName + ", Highest Salary: " + Math.round(highestSalary * 100.0) / 100.0);
         }
 
+        DBConnectionClose();
     }
 
-    @Test
 
+    @Test
     // Find the Employee with the Highest Salary Average in the Research Department
     public void query15() throws SQLException {
+
+        DBConnectionOpen();
 
         System.out.println("Executing Task 15: Find the employee with the highest salary in the Research department.");
         ResultSet result = statement.executeQuery("SELECT e.first_name, e.last_name, MAX(s.salary) AS max_salary " +
@@ -319,15 +299,18 @@ public class DataBaseTest extends DataBaseHelper {
                     + lastName + ", Max Salary: " + Math.round(maxSalary * 100.0) / 100.0);
         }
 
+        DBConnectionClose();
     }
 
-    @Test
 
+    @Test
     //For each department, identify the employee with the highest single salary ever recorded. List the
     //department name, employee's first name, last name, and the peak salary amount. Order the results
     //by the peak salary in descending order.
 
     public void query16() throws SQLException {
+
+        DBConnectionOpen();
 
         System.out.println("Executing Task 16: For each department, identify the employee with the highest single salary ever recorded.");
         ResultSet result = statement.executeQuery("SELECT d.dept_name AS department, e.first_name, e.last_name, s.salary AS max_salary " +
@@ -350,17 +333,19 @@ public class DataBaseTest extends DataBaseHelper {
                     + ", First Name: " + firstName + ", Last Name: " + lastName + ", Max Salary: "
                     + Math.round(maxSalary * 100.0) / 100.0);
         }
+
+        DBConnectionClose();
     }
 
 
     @Test
-
     //Identify the employees in each department who have the highest average salary.
     //List the department name, employee's first name, last name, and the average salary.
     //Order the results by average salary in descending order, showing only those with the
     //highest average salary within their department.
 
     public void query17() throws SQLException {
+
         DBConnectionOpen();
         ResultSet rs = statement.executeQuery(
                 "SELECT employees.first_name,employees.last_name,avg(salary)" + " " +
@@ -371,45 +356,48 @@ public class DataBaseTest extends DataBaseHelper {
                         "WHERE departments.dept_no='d008'" + " " +
                         "GROUP BY employees.first_name,employees.last_name" + " " +
                         "ORDER BY avg(salary) desc;");
+
         DBConnectionClose();
     }
 
-    @Test
 
+    @Test
     //List the names, last names, and hire dates in alphabetical order of all employees
     // hired before January 01, 1990
-
     public void query18() throws SQLException {
+
         DBConnectionOpen();
         ResultSet rs = statement.executeQuery(
                 "SELECT employees.first_name, employees.last_name, employees.hire_date " +
                         "FROM employees " +
                         "WHERE hire_date < '1990-01-01' " +
                         "ORDER BY last_name ASC, first_name ASC;");
+
         DBConnectionClose();
     }
 
-    @Test
 
+    @Test
     //List the names, last names, hire dates of all employees hired between 01 01 1985
     //and December 31, 1989, sorted by hire date.
-
     public void query19() throws SQLException {
+
         DBConnectionOpen();
         ResultSet rs = statement.executeQuery(
                 "SELECT employees.first_name, employees.last_name, employees.hire_date " +
                         "FROM employees " +
                         "WHERE hire_date BETWEEN '1985-01-01' AND '1989-12-31' " +
                         "ORDER BY hire_date ASC;");
+
         DBConnectionClose();
     }
 
-    @Test
 
+    @Test
     //List the names, last names, hire dates, and salaries of all employees in the Sales department
     //who were hired between 01 01 1985 and December 31, 1989, sorted by salary in descending order.
-
     public void query20() throws SQLException {
+
         DBConnectionOpen();
         ResultSet rs = statement.executeQuery("SELECT employees.first_name, employees.last_name, employees.hire_date, salaries.salary" + " " +
                 "FROM employees" + " " +
@@ -419,35 +407,40 @@ public class DataBaseTest extends DataBaseHelper {
                 "WHERE departments.dept_name = 'Sales'" + " " +
                 "AND employees.hire_date BETWEEN '1985-01-01' AND '1989-12-31'" + " " +
                 "ORDER BY salaries.salary DESC;");
+
         DBConnectionClose();
     }
 
-    @Test
 
+    @Test
     //a: Find the count of male employees (179973)
     public void query21a() throws SQLException {
+
         DBConnectionOpen();
         ResultSet rs = statement.executeQuery(
                 "SELECT COUNT(*) AS male_employee_count " +
                         "FROM employees " +
                         "WHERE gender = 'M';");
+
         DBConnectionClose();
     }
 
-    @Test
 
+    @Test
     //b: Determine the count of female employees (120050)
     public void query21b() throws SQLException {
+
         DBConnectionOpen();
         ResultSet rs = statement.executeQuery(
                 "SELECT COUNT(*) AS female_employee_count " +
                         "FROM employees " +
                         "WHERE gender = 'F';");
+
         DBConnectionClose();
     }
 
-    @Test
 
+    @Test
     //c: Find the number of male and female employees by grouping
     public void query21c() throws SQLException {
         DBConnectionOpen();
@@ -455,23 +448,27 @@ public class DataBaseTest extends DataBaseHelper {
                 "SELECT gender, COUNT(*) AS employee_count " +
                         "FROM employees " +
                         "GROUP BY gender;");
+
         DBConnectionClose();
     }
 
-    @Test
 
+    @Test
     //d: Calculate the total number of employees in the company (300023)
     public void query21d() throws SQLException {
+
         DBConnectionOpen();
         ResultSet rs = statement.executeQuery("SELECT COUNT(*) " +
                 "FROM employees;");
+
         DBConnectionClose();
     }
 
-    @Test
 
+    @Test
     //a:Find out how many employees have unique first names (1275)
     public void query22a() throws SQLException {
+
         DBConnectionOpen();
         ResultSet rs = statement.executeQuery("SELECT COUNT(*)" +
                 "FROM (" +
@@ -480,35 +477,41 @@ public class DataBaseTest extends DataBaseHelper {
                 "    GROUP BY first_name" +
                 "    HAVING COUNT(*) = 1" +
                 ") AS unique_names;");
+
         DBConnectionClose();
     }
 
-    @Test
 
+    @Test
     //b: Identify the number of distinct department names (9)
     public void query22b() throws SQLException {
+
         DBConnectionOpen();
         ResultSet rs = statement.executeQuery("SELECT COUNT(DISTINCT departments.dept_name)" +
                 "FROM departments;");
+
         DBConnectionClose();
     }
 
-    @Test
 
+    @Test
     // List the number of employees in each department
     public void query23() throws SQLException {
+
         DBConnectionOpen();
         ResultSet rs = statement.executeQuery("SELECT  departments.dept_name, count(dept_emp.emp_no)" + " " +
                 "FROM departments" + " " +
                 "JOIN dept_emp on departments.dept_no=dept_emp.dept_no" + " " +
                 "GROUP BY departments.dept_name;");
+
         DBConnectionClose();
     }
 
-    @Test
 
+    @Test
     // List all employees hired within the last 5 years from February 20, 1990
     public void query24() throws SQLException {
+
         DBConnectionOpen();
         ResultSet rs = statement.executeQuery("SELECT employees.first_name, employees.last_name, employees.hire_date" + " " +
                 "FROM employees" + " " +
@@ -518,10 +521,8 @@ public class DataBaseTest extends DataBaseHelper {
 
 
     @Test
-
     // 25 - Annemarie Redmiles" adlı çalışanın bilgilerini (çalışan numarası, doğum tarihi, ilk adı, soyadı,
     // cinsiyet, işe alınma tarihi listele.
-
     public void query25() throws SQLException {
 
         DBConnectionOpen();
@@ -532,11 +533,10 @@ public class DataBaseTest extends DataBaseHelper {
         DBConnectionClose();
     }
 
-    @Test
 
+    @Test
     // 26 - "Annemarie Redmiles" adlı çalışanın tüm bilgilerini (çalışan numarası, doğum tarihi, ilk adı,
     //     soyadı, cinsiyet, işe alınma tarihi, maaş, departman ve unvan) listele.
-
     public void query26() throws SQLException {
 
         DBConnectionOpen();
@@ -551,10 +551,9 @@ public class DataBaseTest extends DataBaseHelper {
         DBConnectionClose();
     }
 
+
     @Test
-
     // 27 - D005 bölümündeki tüm çalışanları ve yöneticileri listele
-
     public void query27() throws SQLException {
 
         DBConnectionOpen();
@@ -566,10 +565,9 @@ public class DataBaseTest extends DataBaseHelper {
         DBConnectionClose();
     }
 
+
     @Test
-
-    // 28 - '1994-02-24' tarihinden sonra işe alınan ve 50.000'den fazla kazanan tüm çalışanları listele
-
+    //'1994-02-24' tarihinden sonra işe alınan ve 50.000'den fazla kazanan tüm çalışanları listele
     public void query28() throws SQLException {
 
         DBConnectionOpen();
@@ -579,15 +577,12 @@ public class DataBaseTest extends DataBaseHelper {
                 "where employees.hire_date >'1994-02-24'\n" +
                 "and salaries.salary >'50000';");
 
-
         DBConnectionClose();
     }
 
+
     @Test
-
     // 29. List all employees working in the "Sales" department with the title "Manager"
-    // -- "Satış" bölümünde "Yönetici" unvanıyla çalışan tüm çalışanları listele
-
     public void query29() throws SQLException {
 
         DBConnectionOpen();
@@ -603,10 +598,7 @@ public class DataBaseTest extends DataBaseHelper {
 
 
     @Test
-
     //30. Find the department where employee with '10102' has worked the longest
-    // -- '10102' numaralı çalışanın en uzun süre çalıştığı departmanı bul
-
     public void query30() throws SQLException {
 
         DBConnectionOpen();
@@ -626,10 +618,7 @@ public class DataBaseTest extends DataBaseHelper {
 
 
     @Test
-
     //31. Find the highest paid employee in department D004
-    // -- D004 bölümünde en yüksek maaş alan çalışanı bulun
-
     public void query31() throws SQLException {
 
         DBConnectionOpen();
@@ -645,10 +634,7 @@ public class DataBaseTest extends DataBaseHelper {
 
 
     @Test
-
     //32. Find the entire position history for employee with emp. no '10102'
-    // -- '10102' numaralı çalışanın tüm pozisyon geçmişini bulun
-
     public void query32() throws SQLException {
 
         DBConnectionOpen();
@@ -656,17 +642,14 @@ public class DataBaseTest extends DataBaseHelper {
                 "where emp_no='10102'");
 
         DBConnectionClose();
-
     }
 
+
     @Test
-
-// 33. Finding the average "employee age"
-// Ortalama "çalışan yaşını" bulma
-
+    //Finding the average "employee age"
     public void query33() throws SQLException {
-        DBConnectionOpen();
 
+        DBConnectionOpen();
         ResultSet rs = statement.executeQuery("SELECT AVG(TIMESTAMPDIFF(YEAR, birth_date, CURDATE())) AS average_age FROM employees");
 
         if (rs.next()) {
@@ -679,45 +662,37 @@ public class DataBaseTest extends DataBaseHelper {
 
 
     @Test
-
     //Finding the number of employees per department
-    //-- Bölüm başına çalışan sayısını bulma
-
     public void query34() throws SQLException {
-        {
-        DBConnectionOpen();
 
-        ResultSet rs = statement.executeQuery(
-                "SELECT d.dept_name, COUNT(de.emp_no) AS num_employees " +
-                        "FROM employees.dept_emp de " +
-                        "JOIN employees.departments d ON de.dept_no = d.dept_no " +
-                        "GROUP BY d.dept_name"
-        );
+            DBConnectionOpen();
+            ResultSet rs = statement.executeQuery(
+                    "SELECT d.dept_name, COUNT(de.emp_no) AS num_employees " +
+                            "FROM employees.dept_emp de " +
+                            "JOIN employees.departments d ON de.dept_no = d.dept_no " +
+                            "GROUP BY d.dept_name"
+            );
 
-        while (rs.next()) {
-            String deptName = rs.getString("dept_name");
-            int numEmployees = rs.getInt("num_employees");
-            System.out.println("Department: " + deptName + ", Number of Employees: " + numEmployees);
-        }
-        DBConnectionClose();
+            while (rs.next()) {
+                String deptName = rs.getString("dept_name");
+                int numEmployees = rs.getInt("num_employees");
+                System.out.println("Department: " + deptName + ", Number of Employees: " + numEmployees);
+            }
+
+            DBConnectionClose();
     }
 
-}
 
     @Test
-
     //Finding the managerial history of employee with ID (emp. no) 110022
-    //-- 110022 numaralı çalışanın yönetim geçmişini bulma
-
-
     public void query35() throws SQLException {
-        DBConnectionOpen();
 
+        DBConnectionOpen();
         ResultSet rs = statement.executeQuery(
                 "SELECT dept_no, from_date, to_date " +
-                "FROM employees.dept_manager " +
-                "WHERE emp_no = '110022' " +
-                "ORDER BY from_date ASC"
+                        "FROM employees.dept_manager " +
+                        "WHERE emp_no = '110022' " +
+                        "ORDER BY from_date ASC"
         );
 
         while (rs.next()) {
@@ -726,17 +701,15 @@ public class DataBaseTest extends DataBaseHelper {
             String toDate = rs.getString("to_date");
             System.out.println("Managerial History - Dept No: " + deptNo + ", From Date: " + fromDate + ", To Date: " + toDate);
         }
+
         DBConnectionClose();
     }
 
 
     @Test
+    //Find the duration of employment for each employee.
+    public void query36() throws SQLException {
 
-    //Find the duration of employment for each employee
-    //-- Her çalışanın istihdam süresini bulma
-
-
-    public void query36() throws SQLException{
         DBConnectionOpen();
         ResultSet rs = statement.executeQuery(
                 "SELECT emp_no, first_name, last_name, DATEDIFF(CURDATE(), hire_date) AS employment_duration " +
@@ -744,24 +717,25 @@ public class DataBaseTest extends DataBaseHelper {
                         "ORDER BY employment_duration DESC");
 
 
-            while (rs.next()) {
-                int empNo = rs.getInt("emp_no");
-                String firstName = rs.getString("first_name");
-                String lastName = rs.getString("last_name");
-                int duration = rs.getInt("employment_duration");
+        while (rs.next()) {
+            int empNo = rs.getInt("emp_no");
+            String firstName = rs.getString("first_name");
+            String lastName = rs.getString("last_name");
+            int duration = rs.getInt("employment_duration");
 
-                System.out.println("Employee - Emp No: " + empNo + ", Name: " + firstName + " " + lastName + ", Duration: " + duration + " days");
-            }
+            System.out.println("Employee - Emp No: " + empNo + ", Name: "
+                    + firstName + " " + lastName + ", Duration: " + duration + " days");
+        }
 
         DBConnectionClose();
     }
 
-    @Test
 
+    @Test
     //Find the latest title information for each employee.
     public void query37() throws SQLException {
 
-        System.out.println("Executing Task 37:Find the latest title information for each employee.");
+        DBConnectionOpen();
         ResultSet result = statement.executeQuery("SELECT emp_no, title, from_date " +
                 "FROM employees.titles " +
                 "WHERE to_date = '9999-01-01'");
@@ -775,14 +749,16 @@ public class DataBaseTest extends DataBaseHelper {
             System.out.println("Employee Details - Emp No: " + empNo
                     + ", Title: " + title + ", From Date: " + fromDate);
         }
+
+        DBConnectionClose();
     }
 
-    @Test
 
+    @Test
     // Find the first and last names of managers in department 'D005'.
     public void query38() throws SQLException {
 
-        System.out.println("Executing Task 38: Find the first and last names of managers in department 'D005'");
+        DBConnectionOpen();
         ResultSet result = statement.executeQuery("SELECT e.first_name, e.last_name " +
                 "FROM employees.employees e " +
                 "JOIN employees.dept_manager dm ON e.emp_no = dm.emp_no " +
@@ -795,14 +771,16 @@ public class DataBaseTest extends DataBaseHelper {
             String lastName = result.getString("last_name");
             System.out.println("Manager Details - First Name: " + firstName + ", Last Name: " + lastName);
         }
+
+        DBConnectionClose();
     }
 
-    @Test
 
+    @Test
     //Sort employees by their birth dates.
     public void query39() throws SQLException {
 
-        System.out.println("Executing Task 39: Sort employees by their birth dates");
+        DBConnectionOpen();
         ResultSet result = statement.executeQuery("SELECT * " +
                 "FROM employees.employees " +
                 "ORDER BY birth_date");
@@ -817,14 +795,16 @@ public class DataBaseTest extends DataBaseHelper {
             System.out.println("Employee Details - Emp No: " + empNo + ", First Name: " + firstName + ", Last Name: "
                     + lastName + ", Birth Date: " + birthDate);
         }
+
+        DBConnectionClose();
     }
 
-    @Test
 
+    @Test
     //List employees hired in April 1992
     public void query40() throws SQLException {
 
-        System.out.println("Executing Task 40: List employees hired in April 1992.");
+        DBConnectionOpen();
         ResultSet result = statement.executeQuery("SELECT emp_no, first_name, last_name, gender, hire_date " +
                 "FROM employees.employees " +
                 "WHERE hire_date BETWEEN '1992-04-01' AND '1992-04-30' " +
@@ -842,14 +822,32 @@ public class DataBaseTest extends DataBaseHelper {
                     + firstName + ", Last Name: " + lastName + ", Gender: " + gender + ", Hire Date: " + hireDate);
         }
 
-
+        DBConnectionClose();
     }
 
+
     @Test
-
-
     //Find all departments that employee '10102' has worked in.
-    public void query41() {
+    public void query41() throws SQLException {
+
+        DBConnectionOpen();
+        ResultSet result = statement.executeQuery("SELECT DISTINCT e.first_name, e.last_name, d.dept_name " +
+                "FROM employees.dept_emp de " +
+                "JOIN employees.employees e ON de.emp_no = e.emp_no " +
+                "JOIN employees.departments d ON de.dept_no = d.dept_no " +
+                "WHERE de.emp_no = '10102'");
+
+        int rowCount = 0;
+        while (result.next() && rowCount < 10) {
+            rowCount++;
+            String firstName = result.getString("first_name");
+            String lastName = result.getString("last_name");
+            String deptName = result.getString("dept_name");
+            System.out.println("Department Details - First Name: " + firstName + ", Last Name: "
+                    + lastName + ", Department Name: " + deptName);
+        }
+
+        DBConnectionClose();
     }
 
 }
